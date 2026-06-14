@@ -1,0 +1,67 @@
+services:
+
+  duckdns:
+    image: lscr.io/linuxserver/duckdns:latest
+    container_name: duckdns
+    env_file:
+      - ./env/duckdns.env
+    restart: unless-stopped
+
+  smp:
+    image: simplexchat/smp-server:latest
+    container_name: simplex-smp
+    env_file:
+      - ./env/smp.env
+    ports:
+      - "5223:5223"
+    volumes:
+      - ./simplex/server/config:/etc/opt/simplex
+      - ./simplex/server/state:/var/opt/simplex
+    restart: unless-stopped
+
+  xftp:
+    image: simplexchat/xftp-server:latest
+    container_name: simplex-xftp
+    env_file:
+      - ./env/xftp.env
+    ports:
+      - "443:443"
+    volumes:
+      - ./simplex/file-transfer/config:/etc/opt/simplex-xftp
+      - ./simplex/file-transfer/state:/var/opt/simplex-xftp
+      - ./simplex/file-transfer/files:/srv/xftp
+    restart: unless-stopped
+
+  coturn:
+    image: coturn/coturn
+    container_name: coturn
+    env_file:
+      - ./env/coturn.env
+    network_mode: host
+    volumes:
+      - ./coturn/certs:/certs
+      - ./coturn/turnserver.conf:/etc/coturn/turnserver.conf
+    restart: unless-stopped
+
+  acme:
+    image: neilpang/acme.sh:latest
+    container_name: acme
+    env_file:
+      - ./env/acme.env
+    volumes:
+      - ./acme/account:/acme.sh
+      - ./coturn/certs:/certs
+      - ./coturn/hooks:/hooks
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command:
+      - --cleanup
+      - --interval
+      - "86400"
+    restart: unless-stopped
