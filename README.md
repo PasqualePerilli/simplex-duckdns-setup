@@ -15,7 +15,7 @@ The set of containers is composed by the following:
 # What are the pre-requisites to deploy this to my server?
 You need the following programs installed on your system:
 1. Docker
-2. Git
+2. Bash
 
 You also need to have registered on [Duck DNS](https://www.duckdns.org)
 
