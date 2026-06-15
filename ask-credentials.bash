@@ -1,92 +1,102 @@
 #!/bin/bash
 
-#We need to create a script that asks for your credentials and generates a credentials.env file
-#SUBDOMAIN
-#BASE_DOMAIN
-#TZ
-#DUCKDNS_TOKEN
-#TURN_USER
-#TURN_PASS
-#XFTP_QUOTA
-#ACME_EMAIL
+# ---------------------------------------
+# Comments area
+# ---------------------------------------
 
-_ask_user_question_with_confirmation(){
-  local question="$1"
-  local outputFilePath="$2"
-  local isConfirmed="false"
-  local answer=""
-  local confirmation=""
-  #echo "Comment me out for question $question" #TODO remove me
-  while [[ "$isConfirmed" == "false" ]]; do
-    answer=""
-    confirmation=""
-    echo "In while loop for question $question"
-    read -p "$question " answer
-    read -p "You answered: $answer. Is this correct? [y/N]: " confirmation
-    if [[ "$confirmation" == "y" ]] || [[ "$confirmation" == "yes" ]] || [[ "$confirmation" == "Y" ]] || [[ "$confirmation" == "YES" ]]; then
-      echo "$answer" > "$outputFilePath" 
-      isConfirmed="true"
+#We need to verify Docker is installed
+#We need to verify Docker compose is installed
+#We need to verify curl or wget is installed
+
+#We need to grab ask-credentials.bash and compose.yml from the repository
+#We need to make ask-credentials.bash executable
+#We need to run ask-credentials.bash
+#We need to run docker compose up -d
+
+# ---------------------------------------
+# Functions definitions
+# ---------------------------------------
+
+_pre_requisites_check(){
+  local errorMessage=""
+
+  if [[ $(which docker | grep -v "not found") == "" ]]; then
+    errorMessage="Docker is not installed on this system. Cannot proceed. Please install it and try again."
+  fi
+
+  if [[ $(docker compose --help 2> /dev/null | grep "docker compose") == "" ]]; then
+    composeErrorMessage="Docker compose is not installed on this system. Cannot proceed. Please install it and try again"
+    if [[ "$errorMessage" == "" ]]; then
+      errorMessage="$composeErrorMessage"
+    else
+      errorMessage="${errorMessage}\n${composeErrorMessage}"
+    fi
+  fi
+  
+  local curlInstalled=$(which curl | grep -v "not found")
+  local wgetInstalled=$(which wget | grep -v "not found")
+  
+  if [[ "$curlInstalled" == "" ]] && [[ "$wgetInstalled" == "" ]]; then
+    local downloaderErrorMessage="Neither curl nor wget are installed on this system. Cannot proceed. Please install either or both and try again."
+    if [[ "$errorMessage" == "" ]]; then
+      errorMessage="$downloaderErrorMessage"
+    else
+      errorMessage="${errorMessage}\n${downloaderErrorMessage}"
+    fi
+  fi
+  
+  if [[ "$errorMessage" != "" ]]; then
+    echo "$errorMessage"
+    return 1
+  fi
+
+}
+
+_should_use_curl(){
+  local curlInstalled=$(which curl | grep -v "not found")
+  local wgetInstalled=$(which wget | grep -v "not found")
+  local useCurl="false"
+  if [[ "$curlInstalled" != ""  ]]; then
+    useCurl="true"
+  fi
+  echo "$useCurl"
+}
+
+_manage_remote_downloads(){
+  local useCurl=$(_should_use_curl)
+  local filesToDownload=("https://raw.githubusercontent.com/PasqualePerilli/simplex-duckdns-setup/refs/heads/master/ask-credentials.bash" "https://raw.githubusercontent.com/PasqualePerilli/simplex-duckdns-setup/refs/heads/master/compose.yml" )
+  for fileToDownload in "${filesToDownload[@]}"; do
+    local filename="${fileToDownload##*/}"
+    echo "Downloading file with name: $filename"
+    if [[ "$useCurl" == "true" ]]; then
+	  curl -s -k -H "Cache-Control: no-cache" -H "Pragma: no-cache" -o "$filename" "$fileToDownload" 	 #Use curl
+    else
+	  wget --header "Cache-Control: no-cache" --header "Pragma: no-cache" -O "$filename" "$fileToDownload" #Use wget instead
     fi
   done
-
 }
 
-_generate_random_string(){
-  local length="$1"
-  local lowerCase="a-z"
-  local upperCase="A-Z"
-  local digits="0-9"
-  local specialCharacters="_-"
+
+_manage_local_execution(){
+  #First, we need the ability to execute the ask-credentials.bash script
+  chmod +x "ask-credentials.bash"
+  #Now we need to run it
+  bash "ask-credentials.bash"
+  #This should have created the .env folder with the files within it
+  if [[ ! -d ".env" ]] || [[ ! -f ".env/duckdns.env" ]] || [[ ! -f ".env/smp.env" ]] || [[ ! -f ".env/xftp.env" ]] || [[ ! -f ".env/coturn.env" ]] || [[ ! -f ".env/acme.env" ]] ; then
+    echo "There was a problem defining the credentials. Cannot proceed. Please try again later."
+	return 1
+  fi
+  echo "Now creating the SimpleX stack. Please wait."
+  docker compose up -d
   
-  tr -dc "${lowerCase}${upperCase}${digits}${specialCharacters}" < /dev/urandom | head -c "$length"
-  echo
 }
 
+# ---------------------------------------
+# This is what the script does
+# ---------------------------------------
 
-echo "In order to set up SimpleX, this script needs you to provide a few credentials..."
-credentialsFolder="$HOME/.simplex-credentials"
-mkdir -p "$credentialsFolder"
-echo "Created credentials folder" #TODO remove me
-credentialsFile="$credentialsFolder/credentials.txt"
-echo "About to ask first question" #TODO remove me
-_ask_user_question_with_confirmation "Enter the DuckDNS subdomain:" "$credentialsFile"
-subdomainName=$(cat "$credentialsFile")
-#echo "Read subdomain name $subdomainName"
-baseDomain="duckdns.org"
-timeZone="America/Chicago"
-_ask_user_question_with_confirmation "Enter the DuckDNS token:" "$credentialsFile"
-duckToken=$(cat "$credentialsFile")
-#echo "Read DuckDNS token $duckToken"
-turnUser="simplex"
-turnPassword=$(_generate_random_string 64)
-simpleXFTPQuota="100gb"
-_ask_user_question_with_confirmation "Enter the email to be notified about TLS certificates for the VoIP functionality:" "$credentialsFile"
-acmeEmail=$(cat "$credentialsFile")
-#echo "Read certificate notification email $acmeEmail"
+_pre_requisites_check || return 1
+_manage_remote_downloads
+_manage_local_execution
 
-rm -f "$credentialsFile" &> /dev/null
-rm -rf "$credentialsFolder" &> /dev/null
-
-mkdir -p "./env"
-
-domain="${subdomainName}.${baseDomain}"
-duckEnv="./env/duckdns.env"
-simpleXChatEnv="./env/smp.env"
-simpleXFTPEnv="./env/xftp.env"
-coturnEnv="./env/coturn.env"
-acmeEnv="./env/acme.env"
-
-echo "SUBDOMAINS=${subdomainName}" > "$duckEnv"
-echo "TOKEN=${duckToken}" >> "$duckEnv"
-
-echo "ADDR=${domain}" > "$simpleXChatEnv"
-
-echo "ADDR=${domain}" > "$simpleXFTPEnv"
-echo "QUOTA=${simpleXFTPQuota}" >> "$simpleXFTPEnv"
-
-echo "REALM=${domain}" > "$coturnEnv"
-echo "USER=${turnUser}:${turnPassword}" >> "$coturnEnv"
-
-echo "DOMAIN=${domain}" > "$acmeEnv"
-echo "EMAIL=${acmeEmail}" >> "$acmeEnv"
-echo "DUCKDNS_TOKEN=${duckToken}" >> "$acmeEnv"
