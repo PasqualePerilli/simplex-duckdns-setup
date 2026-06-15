@@ -23,7 +23,13 @@ You also need to have registered on [Duck DNS](https://www.duckdns.org)
 TBA
 
 # How do I set up my server to have this deployed?
-TBA
+
+Just run this very simple bash command:
+
+```bash
+curl -s -k https://raw.githubusercontent.com/PasqualePerilli/simplex-duckdns-setup/refs/heads/master/installation-script.bash | bash
+
+```
 
 # After installation, what do I need to do on the client side?
 TBA
