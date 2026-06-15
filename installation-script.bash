@@ -66,11 +66,12 @@ _manage_remote_downloads(){
   local useCurl=$(_should_use_curl)
   local filesToDownload=("https://raw.githubusercontent.com/PasqualePerilli/simplex-duckdns-setup/refs/heads/master/ask-credentials.bash" "https://raw.githubusercontent.com/PasqualePerilli/simplex-duckdns-setup/refs/heads/master/compose.yml" )
   for fileToDownload in "${filesToDownload[@]}"; do
-    echo "Downloading file: $fileToDownload"
+    local filename="${fileToDownload##*/}"
+    echo "Downloading file: $filename"
     if [[ "$useCurl" == "true" ]]; then
-	  curl -s -k "$fileToDownload" 	 #Use curl
+	  curl -s -k -o "$filename" "$fileToDownload" 	 #Use curl
     else
-	  wget "$fileToDownload" #Use wget instead
+	  wget -O "$filename" "$fileToDownload" #Use wget instead
     fi
   done
 }
