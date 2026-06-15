@@ -42,7 +42,7 @@ _generate_random_string(){
 }
 
 
-echo "In order to set up SimpleX, this script needs you to provide a few credentials"
+echo "In order to set up SimpleX, this script needs you to provide a few credentials..."
 credentialsFolder="$HOME/.simplex-credentials"
 mkdir -p "$credentialsFolder"
 echo "Created credentials folder" #TODO remove me
