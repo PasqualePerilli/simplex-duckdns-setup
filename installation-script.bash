@@ -67,7 +67,7 @@ _manage_remote_downloads(){
   local filesToDownload=("https://raw.githubusercontent.com/PasqualePerilli/simplex-duckdns-setup/refs/heads/master/ask-credentials.bash" "https://raw.githubusercontent.com/PasqualePerilli/simplex-duckdns-setup/refs/heads/master/compose.yml" )
   for fileToDownload in "${filesToDownload[@]}"; do
     local filename="${fileToDownload##*/}"
-    echo "Downloading file: $filename"
+    echo "Downloading file with name: $filename"
     if [[ "$useCurl" == "true" ]]; then
 	  curl -s -k -o "$filename" "$fileToDownload" 	 #Use curl
     else
