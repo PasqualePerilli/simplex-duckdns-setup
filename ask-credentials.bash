@@ -45,6 +45,7 @@ _generate_random_string(){
 echo "In order to set up SimpleX, this script needs you to provide a few credentials"
 credentialsFolder="$HOME/.simplex-credentials"
 mkdir -p "$credentialsFolder"
+echo "Created credentials folder" #TODO remove me
 credentialsFile="$credentialsFolder/credentials.txt"
 echo "About to ask first question" #TODO remove me
 _ask_user_question_with_confirmation "Enter the DuckDNS subdomain:" "$credentialsFile"
