@@ -20,8 +20,8 @@ _ask_user_question_with_confirmation(){
     answer=""
     confirmation=""
 	echo "In while loop..."
-    read -p "$question " answer
-    read -p "You answered: $answer. Is this correct? [y/N]: " confirmation
+    read -p "$question " answer < /dev/tty
+    read -p "You answered: $answer. Is this correct? [y/N]: " confirmation < /dev/tty
     if [[ "$confirmation" == "y" ]] || [[ "$confirmation" == "yes" ]] || [[ "$confirmation" == "Y" ]] || [[ "$confirmation" == "YES" ]]; then
       echo "$answer" > "$outputFilePath" 
       isConfirmed="true"
