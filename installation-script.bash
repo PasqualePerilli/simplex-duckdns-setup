@@ -14,7 +14,7 @@
 #We need to run docker compose up -d
 
 # ---------------------------------------
-#Functions definitions
+# Functions definitions
 # ---------------------------------------
 
 _pre_requisites_check(){
@@ -64,8 +64,8 @@ _should_use_curl(){
 
 _manage_remote_downloads(){
   local useCurl=$(_should_use_curl)
-  local filesToDownload=["https://raw.githubusercontent.com/PasqualePerilli/simplex-duckdns-setup/refs/heads/master/ask-credentials.bash" "https://raw.githubusercontent.com/PasqualePerilli/simplex-duckdns-setup/refs/heads/master/compose.yml" ]
-  for fileToDownload in filesToDownload; do
+  local filesToDownload=("https://raw.githubusercontent.com/PasqualePerilli/simplex-duckdns-setup/refs/heads/master/ask-credentials.bash" "https://raw.githubusercontent.com/PasqualePerilli/simplex-duckdns-setup/refs/heads/master/compose.yml" )
+  for fileToDownload in "${filesToDownload[@]}"; do
     if [[ "$useCurl" == "true" ]]; then
 	  curl -s -k "$fileToDownload" 	 #Use curl
     else
@@ -91,7 +91,7 @@ _manage_local_execution(){
 }
 
 # ---------------------------------------
-#This is what the script does
+# This is what the script does
 # ---------------------------------------
 
 _pre_requisites_check || return 1
