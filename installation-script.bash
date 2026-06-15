@@ -65,13 +65,18 @@ _should_use_curl(){
 _manage_remote_downloads(){
   local useCurl=$(_should_use_curl)
   local filesToDownload=("https://raw.githubusercontent.com/PasqualePerilli/simplex-duckdns-setup/refs/heads/master/ask-credentials.bash" "https://raw.githubusercontent.com/PasqualePerilli/simplex-duckdns-setup/refs/heads/master/compose.yml" )
+  local downloadIndex=0
+  local numberOfFilesToDownload="${#filesToDownload[@]}"
   for fileToDownload in "${filesToDownload[@]}"; do
     local filename="${fileToDownload##*/}"
-    echo "Downloading file with name: $filename"
+	downloadIndex=$(( 1 + $downloadIndex ))
+    echo "Downloading file #${downloadIndex}/${numberOfFilesToDownload} with name: $filename"
     if [[ "$useCurl" == "true" ]]; then
-	  curl -s -k -o "$filename" "$fileToDownload" 	 #Use curl
+	  #curl -s -k -o "$filename" "$fileToDownload" 	 #Use curl
+	  curl -s -k -H "Cache-Control: no-cache" -H "Pragma: no-cache" -o "$filename" "$fileToDownload" 	 #Use curl
     else
-	  wget -O "$filename" "$fileToDownload" #Use wget instead
+	  #wget -O "$filename" "$fileToDownload" #Use wget instead
+	  wget --header "Cache-Control: no-cache" --header "Pragma: no-cache" -O "$filename" "$fileToDownload" #Use wget instead
     fi
   done
 }
