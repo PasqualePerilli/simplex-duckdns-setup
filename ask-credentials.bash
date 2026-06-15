@@ -16,7 +16,7 @@ _ask_user_question_with_confirmation(){
   local isConfirmed="false"
   local answer=""
   local confirmation=""
-  
+  echo "Comment me out for question $question" #TODO remove me
   while [[ "$isConfirmed" == "false" ]]; do
     answer=""
     confirmation=""
@@ -46,6 +46,7 @@ echo "In order to set up SimpleX, this script needs you to provide a few credent
 credentialsFolder="$HOME/.simplex-credentials"
 mkdir -p "$credentialsFolder"
 credentialsFile="$credentialsFolder/credentials.txt"
+echo "About to ask first question" #TODO remove me
 _ask_user_question_with_confirmation "Enter the DuckDNS subdomain:" "$credentialsFile"
 subdomainName=$(cat "$credentialsFile")
 #echo "Read subdomain name $subdomainName"
