@@ -88,7 +88,7 @@ _manage_local_execution(){
   #Now we need to run it
   bash "ask-credentials.bash"
   #This should have created the .env folder with the files within it
-  if [[ ! -d ".env" ]] || [[ ! -f ".env/duckdns.env" ]] || [[ ! -f ".env/smp.env" ]] || [[ ! -f ".env/xftp.env" ]] || [[ ! -f ".env/coturn.env" ]] || [[ ! -f ".env/acme.env" ]] ; then
+  if [[ ! -d "env" ]] || [[ ! -f "env/duckdns.env" ]] || [[ ! -f "env/smp.env" ]] || [[ ! -f "env/xftp.env" ]] || [[ ! -f "env/coturn.env" ]] || [[ ! -f "env/acme.env" ]] ; then
     echo "There was a problem defining the credentials. Cannot proceed. Please try again later."
 	return 1
   fi
