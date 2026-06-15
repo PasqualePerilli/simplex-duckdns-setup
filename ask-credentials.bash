@@ -72,9 +72,11 @@ _manage_remote_downloads(){
 	downloadIndex=$(( 1 + $downloadIndex ))
     echo "Downloading file #${downloadIndex}/${numberOfFilesToDownload} with name: $filename"
     if [[ "$useCurl" == "true" ]]; then
-	  curl -s -k -H "Cache-Control: no-cache" -H "Pragma: no-cache" -o "$filename" "$fileToDownload" 	 #Use curl
+	  curl -s -k -o "$filename" "$fileToDownload" 	 #Use curl
+	  #curl -s -k -H "Cache-Control: no-cache" -H "Pragma: no-cache" -o "$filename" "$fileToDownload" 	 #Use curl
     else
-	  wget --header "Cache-Control: no-cache" --header "Pragma: no-cache" -O "$filename" "$fileToDownload" #Use wget instead
+	  wget -O "$filename" "$fileToDownload" #Use wget instead
+	  #wget --header "Cache-Control: no-cache" --header "Pragma: no-cache" -O "$filename" "$fileToDownload" #Use wget instead
     fi
   done
 }
