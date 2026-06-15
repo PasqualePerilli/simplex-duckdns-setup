@@ -16,10 +16,10 @@ _ask_user_question_with_confirmation(){
   local isConfirmed="false"
   local answer=""
   local confirmation=""
-  
   while [[ "$isConfirmed" == "false" ]]; do
     answer=""
     confirmation=""
+	echo "In while loop..."
     read -p "$question " answer
     read -p "You answered: $answer. Is this correct? [y/N]: " confirmation
     if [[ "$confirmation" == "y" ]] || [[ "$confirmation" == "yes" ]] || [[ "$confirmation" == "Y" ]] || [[ "$confirmation" == "YES" ]]; then
@@ -45,7 +45,9 @@ _generate_random_string(){
 echo "In order to set up SimpleX, this script needs you to provide a few credentials"
 credentialsFolder="$HOME/.simplex-credentials"
 mkdir -p "$credentialsFolder"
+echo "Created credentials folder"
 credentialsFile="$credentialsFolder/credentials.txt"
+echo "About to ask first question"
 _ask_user_question_with_confirmation "Enter the DuckDNS subdomain:" "$credentialsFile"
 subdomainName=$(cat "$credentialsFile")
 #echo "Read subdomain name $subdomainName"
