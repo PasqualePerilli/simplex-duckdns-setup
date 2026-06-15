@@ -16,10 +16,11 @@ _ask_user_question_with_confirmation(){
   local isConfirmed="false"
   local answer=""
   local confirmation=""
-  echo "Comment me out for question $question" #TODO remove me
+  #echo "Comment me out for question $question" #TODO remove me
   while [[ "$isConfirmed" == "false" ]]; do
     answer=""
     confirmation=""
+    echo "In while loop for question $question"
     read -p "$question " answer
     read -p "You answered: $answer. Is this correct? [y/N]: " confirmation
     if [[ "$confirmation" == "y" ]] || [[ "$confirmation" == "yes" ]] || [[ "$confirmation" == "Y" ]] || [[ "$confirmation" == "YES" ]]; then
