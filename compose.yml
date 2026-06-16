@@ -58,7 +58,7 @@ services:
     entrypoint: >
       sh -c ' acme.sh --register-account -m "$$EMAIL" || true; 
         while true; do
-          if acme.sh --issue --force --dns dns_duckdns -d "$$DOMAIN" --keylength ec-256; then 
+          if acme.sh --issue --force --dns dns_duckdns -d "$$DOMAIN" --keylength 4096 --key-file rsa; then 
             acme.sh --install-cert -d "$$DOMAIN" --fullchain-file /certificates/$$DOMAIN.crt --key-file /certificates/$$DOMAIN.key; echo "Sleeping before renewal cycle"; sleep 12h;
           else
             echo "Certificate issuing process failed. Retry in 2 minutes"
