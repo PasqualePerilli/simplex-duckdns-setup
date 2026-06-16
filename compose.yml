@@ -15,11 +15,11 @@ services:
     ports:
       - "5223:5223"
     command:
-      sh -c 'until [ -s /certificates/$ADDR.crt ] && [ -s /certificates/$ADDR.key ]; do
+      sh -c 'until [ -s /certificates/$$ADDR.crt ] && [ -s /certificates/$$ADDR.key ]; do
         echo "waiting for TLS certificates to be available from ACME.sh";
         sleep 5;
         done;
-        exec /entry.sh'
+        exec /usr/local/bin/entrypoint'
     volumes:
       - ./simplex/server/config:/etc/opt/simplex
       - ./simplex/server/state:/var/opt/simplex
@@ -56,10 +56,10 @@ services:
     env_file:
       - ./env/acme.env
     entrypoint: >
-      sh -c ' acme.sh --register-account -m "$EMAIL" || true; 
+      sh -c ' acme.sh --register-account -m "$$EMAIL" || true; 
         while true; do
-          if acme.sh --issue --force --dns dns_duckdns -d "$DOMAIN" --keylength ec-256; then 
-            acme.sh --install-cert -d "$DOMAIN" --fullchain-file /certificates/$DOMAIN.crt --key-file /certificates/$DOMAIN.key; echo "Sleeping before renewal cycle"; sleep 12h;
+          if acme.sh --issue --force --dns dns_duckdns -d "$$DOMAIN" --keylength ec-256; then 
+            acme.sh --install-cert -d "$$DOMAIN" --fullchain-file /certificates/$$DOMAIN.crt --key-file /certificates/$$DOMAIN.key; echo "Sleeping before renewal cycle"; sleep 12h;
           else
             echo "Certificate issuing process failed. Retry in 2 minutes"
             sleep 120;
