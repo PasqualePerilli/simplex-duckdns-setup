@@ -6,6 +6,9 @@ services:
     env_file:
       - ./env/duckdns.env
     restart: unless-stopped
+    dns:
+      - 192.168.178.1
+      - 1.1.1.3
 
   smp:
     image: simplexchat/smp-server:latest
@@ -25,6 +28,9 @@ services:
       - ./simplex/server/state:/var/opt/simplex
       - ./coturn/certs:/certificates
     restart: unless-stopped
+    dns:
+      - 192.168.178.1
+      - 1.1.1.3
 
   xftp:
     image: simplexchat/xftp-server:latest
@@ -38,6 +44,9 @@ services:
       - ./simplex/file-transfer/state:/var/opt/simplex-xftp
       - ./simplex/file-transfer/files:/srv/xftp
     restart: unless-stopped
+    dns:
+      - 192.168.178.1
+      - 1.1.1.3
 
   coturn:
     image: coturn/coturn
@@ -49,6 +58,9 @@ services:
       - ./coturn/certs:/certs
       - ./coturn/turnserver.conf:/etc/coturn/turnserver.conf
     restart: unless-stopped
+    dns:
+      - 192.168.178.1
+      - 1.1.1.3
 
   acme:
     image: neilpang/acme.sh:latest
@@ -72,6 +84,9 @@ services:
       - ./coturn/hooks:/hooks
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
+    dns:
+      - 192.168.178.1
+      - 1.1.1.3
 
   watchtower:
     image: containrrr/watchtower
@@ -83,3 +98,6 @@ services:
       - --interval
       - "86400"
     restart: unless-stopped
+    dns:
+      - 192.168.178.1
+      - 1.1.1.3
