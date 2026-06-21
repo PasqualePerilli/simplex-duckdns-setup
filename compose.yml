@@ -38,7 +38,7 @@ services:
     env_file:
       - ./env/xftp.env
     ports:
-      - "443:443"
+      - "8443:443"
     volumes:
       - ./simplex/file-transfer/config:/etc/opt/simplex-xftp
       - ./simplex/file-transfer/state:/var/opt/simplex-xftp
