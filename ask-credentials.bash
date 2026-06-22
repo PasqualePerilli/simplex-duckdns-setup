@@ -40,6 +40,44 @@ _generate_random_string(){
   echo
 }
 
+_generate_coturn_config_file(){
+  local subdomainName="$1"
+  local baseDomain="$2"
+  local turnUser="$3"
+  local turnPassword="$4"
+  local configFile="./coturn/turnserver.conf"
+  local publicIPv4=$(curl -s ifconfig.me)
+  local internalIPv4=$(hostname -I | tr ' ' '\n' | head -n 1)
+  
+  rm -f "$configFile" &> /dev/null
+  echo "# --- Basic server ---" > "$configFile"
+  echo "listening-port=3478" >> "$configFile"
+  echo "fingerprint" >> "$configFile"
+  echo "lt-cred-mech" >> "$configFile"
+  echo "" >> "$configFile"
+  echo "# --- Domain / identity ---" >> "$configFile"
+  echo "realm=${subdomainName}.${baseDomain}" >> "$configFile"
+  echo "" >> "$configFile"
+  echo "# --- Authentication (simple static user for testing) ---" >> "$configFile"
+  echo "user=${turnUser}:${turnPassword}" >> "$configFile"
+  echo "" >> "$configFile"
+  echo "# --- Networking (IMPORTANT for your setup) ---" >> "$configFile"
+  echo "listening-ip=${internalIPv4}" >> "$configFile"
+  echo "external-ip=${publicIPv4}/${internalIPv4}" >> "$configFile"
+  echo "" >> "$configFile"
+  echo "# --- Logging (so you actually see activity) ---" >> "$configFile"
+  echo "verbose" >> "$configFile"
+  echo "log-file=stdout" >> "$configFile"
+  echo "" >> "$configFile"
+  echo "# --- TURN support (explicitly ensure relay is enabled) ---" >> "$configFile"
+  echo "stun-only=no" >> "$configFile"
+  echo "" >> "$configFile"
+  echo "# --- Security baseline (optional but recommended) ---" >> "$configFile"
+  echo "no-multicast-peers" >> "$configFile"
+  echo "no-cli" >> "$configFile"
+}
+
+
 
 echo "In order to set up SimpleX, this script needs you to provide a few credentials"
 credentialsFolder="$HOME/.simplex-credentials"
@@ -87,3 +125,4 @@ echo "DOMAIN=${domain}" > "$acmeEnv"
 echo "EMAIL=${acmeEmail}" >> "$acmeEnv"
 echo "DUCKDNS_TOKEN=${duckToken}" >> "$acmeEnv"
 echo "DuckDNS_Token=${duckToken}" >> "$acmeEnv"
+_generate_coturn_config_file "$subdomainName" "$baseDomain" "$turnUser" "$turnPassword"
