@@ -50,6 +50,7 @@ _generate_coturn_config_file(){
   local internalIPv4=$(hostname -I | tr ' ' '\n' | head -n 1)
   
   rm -f "$configFile" &> /dev/null
+  rm -rf "$configFile" &> /dev/null
   echo "# --- Basic server ---" > "$configFile"
   echo "listening-port=3478" >> "$configFile"
   echo "fingerprint" >> "$configFile"
