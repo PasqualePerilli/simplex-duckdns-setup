@@ -48,9 +48,10 @@ _generate_coturn_config_file(){
   local configFile="./coturn/turnserver.conf"
   local publicIPv4=$(curl -s ifconfig.me)
   local internalIPv4=$(hostname -I | tr ' ' '\n' | head -n 1)
-  
-  rm -f "$configFile" &> /dev/null
-  rm -rf "$configFile" &> /dev/null
+
+  echo "Deleting existing coturn configuration file $configFile from disk"
+  sudo rm -f "$configFile" &> /dev/null
+  sudo rm -rf "$configFile" &> /dev/null
   echo "# --- Basic server ---" > "$configFile"
   echo "listening-port=3478" >> "$configFile"
   echo "fingerprint" >> "$configFile"
