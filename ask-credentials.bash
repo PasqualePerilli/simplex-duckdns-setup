@@ -116,6 +116,7 @@ echo "SUBDOMAINS=${subdomainName}" > "$duckEnv"
 echo "TOKEN=${duckToken}" >> "$duckEnv"
 
 echo "ADDR=${domain}" > "$simpleXChatEnv"
+echo "XFTP_URL=https://${domain}:8443" >> "$simpleXChatEnv"
 
 echo "ADDR=${domain}" > "$simpleXFTPEnv"
 echo "QUOTA=${simpleXFTPQuota}" >> "$simpleXFTPEnv"
